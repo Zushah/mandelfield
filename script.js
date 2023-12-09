@@ -26,7 +26,7 @@ class Particle {
     }
     draw() {
         ctx.strokeStyle = Math.atan2(this.vel.y, this.vel.x) ? "hsl(" + cb.trig.toDeg(Math.atan2(this.vel.y, this.vel.x) + Math.PI) + ", 100%, 50%)" : "rgb(0, 0, 0)";
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 3;
         ctx.save();
         ctx.translate(canvas.width / 2, canvas.height / 2);
         ctx.beginPath();
@@ -48,12 +48,15 @@ for(let i = -canvas.width / 2 - 100; i < canvas.width / 2 + 100; i += 10) {
 ctx.fillStyle = "rgb(0, 0, 0)";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 function main() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     for(let i = 0; i < particles.length; i++) {
         particles[i].draw();
-        if(cb.vec2.mag(particles[i].dist) > 50) {
+        if(cb.vec2.mag(particles[i].dist) > cb.numb.random(10, 100)) {
             particles.splice(i, 1, new Particle(particles[i].opos));
         }
     }
+    console.log(particles.length);
     window.requestAnimationFrame(main);
 }
 window.requestAnimationFrame(main);
