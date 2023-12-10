@@ -3,13 +3,12 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const cb = Chalkboard;
 
-function F(p) {
-    let z = cb.vec2.toComplex(p);
-    for(let i = 0; i < 16; i++) {
-        z = cb.comp.add(cb.comp.sq(z), cb.vec2.toComplex(p));
-    }
-    let mask = cb.comp.mag(z) < 2 ? 0 : 1;
-    return cb.vec2.new((-p.y / cb.vec2.mag(p)) * (1/2 - mask), (p.x / cb.vec2.mag(p)) * (1/2 - mask));
+let F = cb.vec2.field("-y / Math.sqrt(x*x + y*y)", "x / Math.sqrt(x*x + y*y)");
+let Mandelfield = "function Mandelfield(x, y) { let z = {a: x, b: y}; for(let i = 0; i < 16; i++) { z.a = z.a*z.a - z.b*z.b + x; z.b = 2*z.a*z.b + y; } return Math.sqrt(z.a*z.a + z.b*z.b) < 2 ? 0 : 1; }";
+cb.vec2.fromField = function(vec2field, vec2) {
+    var p = Function('"use strict"; ' + Mandelfield + ' return (x, y) => ((' + vec2field.p + ') * (1/2 - Mandelfield(x, y)));')(),
+        q = Function('"use strict"; ' + Mandelfield + ' return (x, y) => ((' + vec2field.q + ') * (1/2 - Mandelfield(x, y)));')();
+    return cb.vec2.new(p(vec2.x, vec2.y), q(vec2.x, vec2.y));
 }
 class Particle {
     constructor(p) {
@@ -20,7 +19,7 @@ class Particle {
         this.opos = this.pos;
     }
     update() {
-        this.vel = cb.vec2.normalize(F(cb.vec2.scl(this.pos, 1/250)));
+        this.vel = cb.vec2.normalize(cb.vec2.fromField(F, cb.vec2.scl(this.pos, 1/250)));
         this.pos = cb.vec2.add(this.pos, this.vel);
         this.dist = cb.vec2.sub(cb.vec2.absolute(this.pos), cb.vec2.absolute(this.opos));
     }
@@ -56,7 +55,6 @@ function main() {
             particles.splice(i, 1, new Particle(particles[i].opos));
         }
     }
-    console.log(particles.length);
     window.requestAnimationFrame(main);
 }
 window.requestAnimationFrame(main);
