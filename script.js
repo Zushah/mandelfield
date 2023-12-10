@@ -3,11 +3,11 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const cb = Chalkboard;
 
-let F = cb.vec2.field("-y / Math.sqrt(x*x + y*y)", "x / Math.sqrt(x*x + y*y)");
-let Mandelfield = "function Mandelfield(x, y) { let z = {a: x, b: y}; for(let i = 0; i < 16; i++) { z.a = z.a*z.a - z.b*z.b + x; z.b = 2*z.a*z.b + y; } return Math.sqrt(z.a*z.a + z.b*z.b) < 2 ? 0 : 1; }";
+const F = cb.vec2.field("-y / Math.sqrt(x*x + y*y)", "x / Math.sqrt(x*x + y*y)");
+const Mandelfield = "function Mandelfield(x, y) { let a = x, b = y; for(let i = 0; i < 16; i++) { let aa = a*a - b*b, bb = 2*a*b; a = aa + x, b = bb + y; } return a*a + b*b < 4 ? 1 : -1; }";
 cb.vec2.fromField = function(vec2field, vec2) {
-    var p = Function('"use strict"; ' + Mandelfield + ' return (x, y) => ((' + vec2field.p + ') * (1/2 - Mandelfield(x, y)));')(),
-        q = Function('"use strict"; ' + Mandelfield + ' return (x, y) => ((' + vec2field.q + ') * (1/2 - Mandelfield(x, y)));')();
+    let p = Function('"use strict"; ' + Mandelfield + ' return (x, y) => ((' + vec2field.p + ') * Mandelfield(x, y));')(),
+        q = Function('"use strict"; ' + Mandelfield + ' return (x, y) => ((' + vec2field.q + ') * Mandelfield(x, y));')();
     return cb.vec2.new(p(vec2.x, vec2.y), q(vec2.x, vec2.y));
 }
 class Particle {
