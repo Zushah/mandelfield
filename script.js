@@ -3,11 +3,11 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const cb = Chalkboard;
 
-const F = cb.vec2.field("-y / Math.sqrt(x*x + y*y)", "x / Math.sqrt(x*x + y*y)");
+const F = cb.vec2.field("-y / Math.sqrt(x*x + y*y) * Mandelfield(x, y)", "x / Math.sqrt(x*x + y*y) * Mandelfield(x, y)");
 const Mandelfield = "function Mandelfield(x, y) { let a = x, b = y; for(let i = 0; i < 16; i++) { let aa = a*a - b*b, bb = 2*a*b; a = aa + x, b = bb + y; } return a*a + b*b < 4 ? 1 : -1; }";
 cb.vec2.fromField = function(vec2field, vec2) {
-    let p = Function('"use strict"; ' + Mandelfield + ' return (x, y) => ((' + vec2field.p + ') * Mandelfield(x, y));')(),
-        q = Function('"use strict"; ' + Mandelfield + ' return (x, y) => ((' + vec2field.q + ') * Mandelfield(x, y));')();
+    let p = cb.real.parse("(x, y) => " + vec2field.p, Mandelfield),
+        q = cb.real.parse("(x, y) => " + vec2field.q, Mandelfield);
     return cb.vec2.new(p(vec2.x, vec2.y), q(vec2.x, vec2.y));
 }
 class Particle {
@@ -24,7 +24,7 @@ class Particle {
         this.dist = cb.vec2.sub(cb.vec2.absolute(this.pos), cb.vec2.absolute(this.opos));
     }
     draw() {
-        ctx.strokeStyle = Math.atan2(this.vel.y, this.vel.x) ? "hsl(" + cb.trig.toDeg(Math.atan2(this.vel.y, this.vel.x) + Math.PI) + ", 100%, 50%)" : "rgb(0, 0, 0)";
+        ctx.strokeStyle = Math.atan2(this.vel.y, this.vel.x) ? "hsl(" + cb.trig.toDeg(Math.atan2(this.vel.y, this.vel.x) + cb.PI()) + ", 100%, 50%)" : "rgb(0, 0, 0)";
         ctx.lineWidth = 3;
         ctx.save();
         ctx.translate(canvas.width / 2, canvas.height / 2);
