@@ -24,7 +24,7 @@ class Particle {
         this.dist = cb.vec2.sub(cb.vec2.absolute(this.pos), cb.vec2.absolute(this.opos));
     }
     draw() {
-        ctx.strokeStyle = Math.atan2(this.vel.y, this.vel.x) ? "hsl(" + cb.trig.toDeg(Math.atan2(this.vel.y, this.vel.x) + cb.PI()) + ", 100%, 50%)" : "rgb(0, 0, 0)";
+        ctx.strokeStyle = cb.vec2.ang(this.vel) ? "hsl(" + cb.trig.toDeg(cb.vec2.ang(this.vel) + cb.PI()) + ", 100%, 50%)" : "rgb(0, 0, 0)";
         ctx.lineWidth = 3;
         ctx.save();
         ctx.translate(canvas.width / 2, canvas.height / 2);
