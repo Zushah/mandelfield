@@ -4,22 +4,22 @@ canvas.height = window.innerHeight;
 const cb = Chalkboard;
 
 cb.PARSEPREFIX = "function Mandelfield(x, y) { let a = x, b = y; for(let i = 0; i < 16; i++) { let aa = a*a - b*b, bb = 2*a*b; a = aa + x, b = bb + y; } return a*a + b*b < 4 ? 1 : -1; }";
-const F = cb.vec2.field("-y / Math.sqrt(x*x + y*y) * Mandelfield(x, y)", "x / Math.sqrt(x*x + y*y) * Mandelfield(x, y)");
+const F = cb.vect.field("-y / Math.sqrt(x*x + y*y) * Mandelfield(x, y)", "x / Math.sqrt(x*x + y*y) * Mandelfield(x, y)");
 class Particle {
     constructor(p) {
         this.pos = p;
-        this.vel = cb.vec2.new(0);
-        this.dist = cb.vec2.new(0);
+        this.vel = cb.vect.init(0, 0);
+        this.dist = cb.vect.init(0, 0);
         this.ppos = this.pos;
         this.opos = this.pos;
     }
     update() {
-        this.vel = cb.vec2.normalize(cb.vec2.fromField(F, cb.vec2.scl(this.pos, 1/250)));
-        this.pos = cb.vec2.add(this.pos, this.vel);
-        this.dist = cb.vec2.sub(cb.vec2.absolute(this.pos), cb.vec2.absolute(this.opos));
+        this.vel = cb.vect.normalize(cb.vect.fromField(F, cb.vect.scl(this.pos, 1/250)));
+        this.pos = cb.vect.add(this.pos, this.vel);
+        this.dist = cb.vect.sub(cb.vect.absolute(this.pos), cb.vect.absolute(this.opos));
     }
     draw() {
-        ctx.strokeStyle = cb.vec2.ang(this.vel) ? "hsl(" + cb.trig.toDeg(cb.vec2.ang(this.vel) + cb.PI()) + ", 100%, 50%)" : "rgb(0, 0, 0)";
+        ctx.strokeStyle = cb.vect.ang(this.vel) ? "hsl(" + cb.trig.toDeg(cb.vect.ang(this.vel) + cb.PI()) + ", 100%, 50%)" : "rgb(0, 0, 0)";
         ctx.lineWidth = 3;
         ctx.save();
         ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -35,7 +35,7 @@ class Particle {
 let particles = [];
 for(let i = -canvas.width / 2 - 100; i < canvas.width / 2 + 100; i += 10) {
     for(let j = -canvas.height / 2 - 100; j < canvas.height / 2 + 100; j += 10) {
-        particles.push(new Particle(cb.vec2.new(i, j)));
+        particles.push(new Particle(cb.vect.init(i, j)));
     }
 }
 
@@ -46,7 +46,7 @@ function main() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     for(let i = 0; i < particles.length; i++) {
         particles[i].draw();
-        if(cb.vec2.mag(particles[i].dist) > cb.numb.random(10, 100)) {
+        if(cb.vect.magsq(particles[i].dist) > cb.numb.random(100, 10000)) {
             particles.splice(i, 1, new Particle(particles[i].opos));
         }
     }
